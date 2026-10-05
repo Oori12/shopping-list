@@ -4,10 +4,10 @@
   데이터 접근 권한은 Firestore Security Rules로 제한합니다.
 */
 window.FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+ apiKey: "AIzaSyCN1mFRVcj9F9JsiDcWjdf4yJo5NNTWqAk",
+  authDomain: "oori-shopping-list.firebaseapp.com",
+  projectId: "oori-shopping-list",
+  storageBucket: "oori-shopping-list.firebasestorage.app",
+  messagingSenderId: "1059180366175",
+  appId: "1:1059180366175:web:40694a8e54ed0763048eea"
 };
