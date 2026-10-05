@@ -1,0 +1,47 @@
+살 것 v2 — 가족 공유 설정 (Firebase 무료 프로젝트 1회 연결)
+
+이번 버전에 이미 들어간 기능
+- 기본 카테고리에 '가전제품' 추가
+- 시작 화면에 splash.png 표시 후 천천히 사라짐
+- 가족 공유 모드
+- 각 물품에 '등록: 사용자이름' 표시
+- 가족 모두 실시간으로 같은 목록 확인/추가/수정/완료 처리
+- 가족끼리 카테고리와 단위 설정도 공유
+- 기존 로컬 목록이 있고 공유 계정이 비어 있으면 첫 연결 시 목록 업로드 가능
+- 공유를 연결하지 않아도 기존처럼 개인용 로컬 앱으로 사용 가능
+
+[Firebase 설정]
+1. Firebase Console에서 새 프로젝트를 만듭니다.
+2. 프로젝트에 Web App(</>)을 하나 추가합니다.
+3. Authentication > Sign-in method 에서 Email/Password를 활성화합니다.
+4. Firestore Database를 생성합니다.
+5. Firestore > Rules에 아래 규칙을 붙여 넣고 Publish 합니다.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /families/{userId}/{document=**} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
+    }
+  }
+}
+
+6. Firebase의 웹 앱 설정에서 firebaseConfig 값을 복사합니다.
+7. 이 폴더의 firebase-config.js를 메모장으로 열고 각 값을 붙여 넣습니다.
+8. GitHub shopping-list 저장소의 기존 파일을 이 버전 파일들로 교체/업로드합니다.
+9. 앱을 연 뒤 ⚙️ > 가족 공유에서
+   - 내 이름 입력
+   - 가족용 이메일/비밀번호로 '새 가족 계정 만들기'
+10. 다른 가족은 같은 앱 주소를 설치한 뒤 자기 이름을 입력하고,
+    같은 가족 이메일/비밀번호로 '로그인'하면 같은 목록이 보입니다.
+
+중요
+- '내 이름'은 각 휴대폰마다 다르게 입력합니다. 예: 혜원 / 엄마 / 아빠
+- 가족용 이메일/비밀번호는 가족끼리 공유하는 이 장보기 앱 전용 계정으로 쓰는 것을 권장합니다.
+- Firebase 설정을 하지 않아도 앱은 개인용 로컬 모드로 정상 작동합니다.
+
+업데이트 방법
+- 기존 GitHub Pages 주소는 그대로 두고 파일만 교체하면 됩니다.
+- 브라우저/PWA에 이전 화면이 남으면 앱을 완전히 종료 후 다시 열거나,
+  Chrome에서 페이지 새로고침을 한 번 해주세요.

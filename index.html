@@ -1,261 +1,268 @@
 <!--
-  살 것 - Shopping List PWA
+  살 것 - Family Shopping List PWA
   Copyright © 2026 oori. All Rights Reserved.
 -->
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#f7f4ee" />
-  <title>살 것</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <style>
-    :root{
-      --bg:#f7f4ee; --card:#ffffff; --text:#1f2328; --muted:#747474;
-      --line:#e7e1d8; --accent:#37473b; --soft:#eef2ec; --danger:#a84646;
-      --radius:18px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;background:var(--bg);color:var(--text);
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    }
-    button,input,select,textarea{font:inherit}
-    button{cursor:pointer}
-    .app{max-width:720px;margin:0 auto;padding:18px 16px 80px}
-    .top{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      position:sticky;top:0;background:rgba(247,244,238,.94);backdrop-filter:blur(8px);
-      padding:10px 0 12px;z-index:5;
-    }
-    h1{font-size:28px;margin:0}
-    .icon-btn,.primary,.ghost,.danger{
-      border:0;border-radius:14px;padding:11px 14px;font-weight:700
-    }
-    .primary{background:var(--accent);color:#fff}
-    .ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
-    .danger{background:#fff0f0;color:var(--danger);border:1px solid #f2cccc}
-    .chips{display:flex;gap:8px;overflow:auto;padding:8px 0 12px}
-    .chip{
-      border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:999px;
-      white-space:nowrap
-    }
-    .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-    .section{margin-top:14px}
-    .section h2{font-size:16px;margin:0 0 10px;color:#444}
-    .card{
-      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-      padding:14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.03)
-    }
-    .item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start}
-    .check{
-      width:26px;height:26px;border-radius:8px;border:2px solid #bbb;background:#fff;
-      margin-top:2px;display:grid;place-items:center;font-weight:900
-    }
-    .check.done{background:var(--accent);color:#fff;border-color:var(--accent)}
-    .item-title{font-size:17px;font-weight:800}
-    .meta{font-size:13px;color:var(--muted);margin-top:3px}
-    .memo{font-size:14px;margin-top:7px;white-space:pre-wrap}
-    .star{border:0;background:transparent;font-size:22px;padding:0 2px}
-    .star.on{filter:saturate(1.6)}
-    .quick{
-      display:flex;gap:8px;overflow:auto;padding-bottom:4px
-    }
-    .quick button{
-      border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;white-space:nowrap
-    }
-    .empty{color:var(--muted);text-align:center;padding:26px 8px}
-    .row{display:flex;gap:8px;flex-wrap:wrap}
-    .row > *{flex:1 1 140px}
-    label{font-size:13px;color:#555;font-weight:700;display:block;margin:10px 0 5px}
-    input,select,textarea{
-      width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);
-      background:#fff;color:var(--text)
-    }
-    textarea{min-height:82px;resize:vertical}
-    dialog{
-      width:min(92vw,520px);border:0;border-radius:22px;padding:0;background:#fff;
-      box-shadow:0 20px 70px rgba(0,0,0,.24)
-    }
-    dialog::backdrop{background:rgba(0,0,0,.35)}
-    .modal{padding:20px}
-    .modal h3{margin:0 0 8px}
-    .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
-    .small{font-size:12px;color:var(--muted)}
-    .manage-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-    .manage-row{display:flex;gap:8px}
-    .manage-row input{flex:1}
-    .completed .item-title{text-decoration:line-through;color:#777}
-    .footer-note{font-size:12px;color:#888;text-align:center;margin-top:28px}
-    .hidden{display:none!important}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f4ee">
+<title>살 것</title>
+<link rel="manifest" href="manifest.webmanifest">
+<script src="firebase-config.js"></script>
+<style>
+:root{
+  --bg:#f7f4ee;--card:#fff;--text:#20231f;--muted:#777;
+  --line:#e5dfd6;--accent:#394b3e;--soft:#edf2ed;--danger:#a84848;
+  --radius:18px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+#splash{
+  position:fixed;inset:0;z-index:9999;background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  opacity:1;transition:opacity .9s ease;
+}
+#splash.hide{opacity:0;pointer-events:none}
+#splash img{width:100%;height:100%;object-fit:contain}
+.app{max-width:720px;margin:0 auto;padding:18px 16px 80px}
+.top{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  position:sticky;top:0;background:rgba(247,244,238,.94);backdrop-filter:blur(8px);
+  padding:10px 0 12px;z-index:5
+}
+h1{font-size:28px;margin:0}.small{font-size:12px;color:var(--muted)}
+.status{display:inline-flex;align-items:center;gap:5px;margin-top:4px;font-size:12px;color:#666}
+.dot{width:7px;height:7px;border-radius:50%;background:#aaa}.dot.on{background:#3b8d55}
+.primary,.ghost,.danger{border:0;border-radius:14px;padding:11px 14px;font-weight:700}
+.primary{background:var(--accent);color:#fff}.ghost{background:#fff;border:1px solid var(--line)}
+.danger{background:#fff1f1;color:var(--danger);border:1px solid #f0cccc}
+.chips{display:flex;gap:8px;overflow:auto;padding:8px 0 12px}
+.chip{border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:999px;white-space:nowrap}
+.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.section{margin-top:14px}.section h2{font-size:16px;margin:0 0 10px;color:#444}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.03)}
+.item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start}
+.check{width:27px;height:27px;border-radius:8px;border:2px solid #bbb;background:#fff;margin-top:2px;display:grid;place-items:center;font-weight:900}
+.check.done{background:var(--accent);color:#fff;border-color:var(--accent)}
+.item-title{font-size:17px;font-weight:800}.meta{font-size:13px;color:var(--muted);margin-top:3px}
+.by{font-size:12px;color:#8b796b;margin-top:4px}.memo{font-size:14px;margin-top:7px;white-space:pre-wrap}
+.star{border:0;background:transparent;font-size:22px;padding:0 2px}
+.quick{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
+.quick button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;white-space:nowrap}
+.empty{color:var(--muted);text-align:center;padding:26px 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1 1 130px}
+label{font-size:13px;color:#555;font-weight:700;display:block;margin:10px 0 5px}
+input,select,textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--text)}
+textarea{min-height:82px;resize:vertical}
+dialog{width:min(92vw,540px);border:0;border-radius:22px;padding:0;background:#fff;box-shadow:0 20px 70px rgba(0,0,0,.24)}
+dialog::backdrop{background:rgba(0,0,0,.35)}.modal{padding:20px}.modal h3{margin:0 0 8px}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.manage-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}.manage-row{display:flex;gap:8px}.manage-row input{flex:1}
+.completed .item-title{text-decoration:line-through;color:#777}.hidden{display:none!important}
+.share-box{background:var(--soft);border-radius:16px;padding:14px;margin:12px 0}
+.footer-note{font-size:12px;color:#888;text-align:center;margin-top:28px}
+</style>
 </head>
 <body>
+<div id="splash"><img src="splash.png" alt=""></div>
+
 <div class="app">
-  <header class="top">
-    <div>
-      <h1>🛒 살 것</h1>
-      <div class="small" id="countText"></div>
-    </div>
-    <div class="row" style="flex:0 0 auto">
-      <button class="ghost" id="settingsBtn" aria-label="설정">⚙️</button>
-      <button class="primary" id="addBtn">＋ 추가</button>
-    </div>
-  </header>
+<header class="top">
+  <div>
+    <h1>🛒 살 것</h1>
+    <div class="small" id="countText"></div>
+    <div class="status"><span class="dot" id="syncDot"></span><span id="syncText">개인 저장</span></div>
+  </div>
+  <div class="row" style="flex:0 0 auto">
+    <button class="ghost" id="settingsBtn">⚙️</button>
+    <button class="primary" id="addBtn">＋ 추가</button>
+  </div>
+</header>
 
-  <div class="chips" id="categoryChips"></div>
+<div class="chips" id="categoryChips"></div>
 
-  <section class="section">
-    <h2>살 것</h2>
-    <div id="activeList"></div>
-  </section>
+<section class="section">
+  <h2>살 것</h2>
+  <div id="activeList"></div>
+</section>
 
-  <section class="section" id="frequentSection">
-    <h2>⭐ 자주 사는 물건</h2>
-    <div class="quick" id="frequentList"></div>
-  </section>
+<section class="section">
+  <h2>⭐ 자주 사는 물건</h2>
+  <div class="quick" id="frequentList"></div>
+</section>
 
-  <section class="section">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-      <h2>구매완료</h2>
-      <button class="ghost" id="clearDoneBtn">완료 비우기</button>
-    </div>
-    <div id="doneList" class="completed"></div>
-  </section>
+<section class="section">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <h2>구매완료</h2>
+    <button class="ghost" id="clearDoneBtn">완료 비우기</button>
+  </div>
+  <div id="doneList" class="completed"></div>
+</section>
 
-  <div class="footer-note">데이터는 이 기기의 브라우저에 저장됩니다.</div>
+<div class="footer-note">© 2026 oori · All Rights Reserved.</div>
 </div>
 
 <dialog id="itemDialog">
-  <form method="dialog" class="modal" id="itemForm">
-    <h3 id="dialogTitle">물건 추가</h3>
-    <input type="hidden" id="itemId" />
-    <label>품목명</label>
-    <input id="name" required placeholder="예: 우유" autocomplete="off" />
-    <div class="row">
-      <div>
-        <label>카테고리</label>
-        <select id="category"></select>
-      </div>
-      <div>
-        <label>수량</label>
-        <input id="qty" placeholder="예: 2" />
-      </div>
-      <div>
-        <label>단위</label>
-        <select id="unit"></select>
-      </div>
-    </div>
-    <label>메모</label>
-    <textarea id="memo" placeholder="예: 저지방, 세일하면 사기"></textarea>
-    <label style="display:flex;align-items:center;gap:8px;font-size:14px">
-      <input id="frequent" type="checkbox" style="width:auto" />
-      자주 사는 물건으로 등록
-    </label>
-    <div class="actions">
-      <button type="button" class="danger hidden" id="deleteItemBtn">삭제</button>
-      <button type="button" class="ghost" id="cancelItemBtn">취소</button>
-      <button class="primary" value="default">저장</button>
-    </div>
-  </form>
+<form method="dialog" class="modal" id="itemForm">
+  <h3 id="dialogTitle">물건 추가</h3>
+  <input type="hidden" id="itemId">
+  <label>품목명</label><input id="name" required placeholder="예: 우유" autocomplete="off">
+  <div class="row">
+    <div><label>카테고리</label><select id="category"></select></div>
+    <div><label>수량</label><input id="qty" placeholder="예: 2"></div>
+    <div><label>단위</label><select id="unit"></select></div>
+  </div>
+  <label>메모</label><textarea id="memo" placeholder="예: 저지방, 세일하면 사기"></textarea>
+  <label style="display:flex;align-items:center;gap:8px;font-size:14px">
+    <input id="frequent" type="checkbox" style="width:auto"> 자주 사는 물건으로 등록
+  </label>
+  <div class="actions">
+    <button type="button" class="danger hidden" id="deleteItemBtn">삭제</button>
+    <button type="button" class="ghost" id="cancelItemBtn">취소</button>
+    <button class="primary">저장</button>
+  </div>
+</form>
 </dialog>
 
 <dialog id="settingsDialog">
-  <div class="modal">
-    <h3>설정</h3>
-    <p class="small">카테고리와 단위를 직접 추가·수정·삭제할 수 있습니다.</p>
+<div class="modal">
+  <h3>설정</h3>
 
-    <label>카테고리 관리</label>
-    <div class="manage-list" id="categoryManage"></div>
-    <button class="ghost" id="addCategoryBtn" style="margin-top:8px">＋ 카테고리</button>
-
-    <label style="margin-top:18px">단위 관리</label>
-    <div class="manage-list" id="unitManage"></div>
-    <button class="ghost" id="addUnitBtn" style="margin-top:8px">＋ 단위</button>
-
-    <div class="actions">
-      <button class="ghost" id="exportBtn">백업 내보내기</button>
-      <label class="ghost" style="margin:0;display:inline-flex;align-items:center;justify-content:center">
-        백업 불러오기
-        <input type="file" id="importFile" accept="application/json" class="hidden">
-      </label>
-      <button class="primary" id="closeSettingsBtn">완료</button>
-    </div>
+  <div class="share-box">
+    <div style="font-weight:800">👨‍👩‍👧 가족 공유</div>
+    <div class="small" id="shareSummary" style="margin-top:5px">현재 개인 저장 모드입니다.</div>
+    <button class="ghost" id="openShareBtn" style="margin-top:10px">가족 공유 설정</button>
   </div>
+
+  <label>카테고리 관리</label>
+  <div class="manage-list" id="categoryManage"></div>
+  <button class="ghost" id="addCategoryBtn" style="margin-top:8px">＋ 카테고리</button>
+
+  <label style="margin-top:18px">단위 관리</label>
+  <div class="manage-list" id="unitManage"></div>
+  <button class="ghost" id="addUnitBtn" style="margin-top:8px">＋ 단위</button>
+
+  <div class="actions">
+    <button class="ghost" id="exportBtn">백업 내보내기</button>
+    <label class="ghost" style="margin:0;display:inline-flex;align-items:center;justify-content:center">
+      백업 불러오기<input type="file" id="importFile" accept="application/json" class="hidden">
+    </label>
+    <button class="primary" id="closeSettingsBtn">완료</button>
+  </div>
+</div>
+</dialog>
+
+<dialog id="shareDialog">
+<div class="modal">
+  <h3>가족 공유</h3>
+  <p class="small">가족은 같은 이메일/비밀번호를 사용하고, 각 휴대폰에서 이름만 다르게 설정합니다.</p>
+
+  <div id="firebaseMissing" class="share-box hidden">
+    <b>Firebase 연결이 아직 없습니다.</b>
+    <div class="small" style="margin-top:5px">FIREBASE_SETUP.txt 안내에 따라 firebase-config.js를 한 번 설정해주세요.</div>
+  </div>
+
+  <label>이 휴대폰 사용자 이름</label>
+  <input id="memberName" placeholder="예: 혜원, 엄마, 아빠">
+
+  <label>가족용 이메일</label>
+  <input id="familyEmail" type="email" placeholder="가족 장보기용 이메일">
+
+  <label>가족용 비밀번호</label>
+  <input id="familyPassword" type="password" placeholder="6자 이상">
+
+  <div class="small" id="shareMessage" style="margin-top:10px"></div>
+
+  <div class="actions">
+    <button class="danger hidden" id="logoutBtn">공유 해제</button>
+    <button class="ghost" id="closeShareBtn">닫기</button>
+    <button class="ghost" id="createFamilyBtn">새 가족 계정 만들기</button>
+    <button class="primary" id="loginFamilyBtn">로그인</button>
+  </div>
+</div>
 </dialog>
 
 <script>
-const KEY = 'hyeweon-shopping-v1';
+const KEY='hyeweon-shopping-v1';
+const PROFILE_KEY='oori-family-profile-v1';
 
-const defaults = {
-  categories:['식재료','생활용품','욕실','주방','기타'],
+const defaults={
+  categories:['식재료','생활용품','욕실','주방','가전제품','기타'],
   units:['개','팩','병','봉','통','박스','kg','g','L','mL','망','판','모'],
   items:[]
 };
 
-let state = load();
-let filter = '전체';
+let state=load();
+if(!state.categories.includes('가전제품')){
+  const etc=state.categories.indexOf('기타');
+  if(etc>=0) state.categories.splice(etc,0,'가전제품'); else state.categories.push('가전제품');
+  localSave();
+}
+let filter='전체';
+let cloud=null;
+let cloudMode=false;
+let unsubscribeItems=null;
+let unsubscribeSettings=null;
+let profile=loadProfile();
 
 function load(){
   try{
-    const saved = JSON.parse(localStorage.getItem(KEY));
-    if(saved && saved.categories && saved.units && saved.items) return saved;
+    const s=JSON.parse(localStorage.getItem(KEY));
+    if(s&&Array.isArray(s.categories)&&Array.isArray(s.units)&&Array.isArray(s.items)) return s;
   }catch(e){}
-  return structuredClone(defaults);
+  return JSON.parse(JSON.stringify(defaults));
 }
-function save(){
-  localStorage.setItem(KEY, JSON.stringify(state));
-  render();
+function loadProfile(){
+  try{return JSON.parse(localStorage.getItem(PROFILE_KEY))||{memberName:'',email:''}}catch(e){return{memberName:'',email:''}}
 }
-function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
-function esc(s=''){
-  return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
-}
+function saveProfile(){localStorage.setItem(PROFILE_KEY,JSON.stringify(profile))}
+function localSave(){localStorage.setItem(KEY,JSON.stringify(state))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 
-const activeList = document.querySelector('#activeList');
-const doneList = document.querySelector('#doneList');
-const frequentList = document.querySelector('#frequentList');
-const categoryChips = document.querySelector('#categoryChips');
-const countText = document.querySelector('#countText');
+const q=s=>document.querySelector(s);
+const activeList=q('#activeList'),doneList=q('#doneList'),frequentList=q('#frequentList'),
+categoryChips=q('#categoryChips'),countText=q('#countText');
 
 function render(){
   renderChips();
-  const active = state.items.filter(i=>!i.done && (filter==='전체'||i.category===filter));
-  const done = state.items.filter(i=>i.done && (filter==='전체'||i.category===filter));
-  countText.textContent = `${state.items.filter(i=>!i.done).length}개 남음`;
-  activeList.innerHTML = active.length ? active.map(itemHtml).join('') : '<div class="empty">살 물건이 없습니다.</div>';
-  doneList.innerHTML = done.length ? done.map(itemHtml).join('') : '<div class="empty">구매완료 항목이 없습니다.</div>';
+  const active=state.items.filter(i=>!i.done&&(filter==='전체'||i.category===filter));
+  const done=state.items.filter(i=>i.done&&(filter==='전체'||i.category===filter));
+  countText.textContent=`${state.items.filter(i=>!i.done).length}개 남음`;
+  activeList.innerHTML=active.length?active.map(itemHtml).join(''):'<div class="empty">살 물건이 없습니다.</div>';
+  doneList.innerHTML=done.length?done.map(itemHtml).join(''):'<div class="empty">구매완료 항목이 없습니다.</div>';
 
-  const favs = state.items.filter(i=>i.frequent);
-  const uniq = [];
-  const seen = new Set();
-  for(const i of favs){
-    const k = [i.name,i.category,i.qty,i.unit,i.memo].join('|');
-    if(!seen.has(k)){ seen.add(k); uniq.push(i); }
+  const seen=new Set(),favs=[];
+  for(const i of state.items.filter(i=>i.frequent)){
+    const k=[i.name,i.category,i.qty,i.unit,i.memo].join('|');
+    if(!seen.has(k)){seen.add(k);favs.push(i)}
   }
-  frequentList.innerHTML = uniq.length
-    ? uniq.map(i=>`<button data-quick="${esc(i.id)}">＋ ${esc(i.name)}</button>`).join('')
-    : '<span class="small">별표를 켠 물건이 여기에 표시됩니다.</span>';
-
+  frequentList.innerHTML=favs.length
+    ?favs.map(i=>`<button data-quick="${esc(i.id)}">＋ ${esc(i.name)}</button>`).join('')
+    :'<span class="small">별표를 켠 물건이 여기에 표시됩니다.</span>';
   bindItemEvents();
+  updateSyncUI();
 }
 function itemHtml(i){
-  const meta = [i.category, [i.qty,i.unit].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+  const meta=[i.category,[i.qty,i.unit].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
   return `<div class="card item" data-id="${esc(i.id)}">
     <button class="check ${i.done?'done':''}" data-action="toggle">${i.done?'✓':''}</button>
     <div data-action="edit" style="min-width:0">
       <div class="item-title">${esc(i.name)}</div>
       <div class="meta">${esc(meta)}</div>
+      ${i.addedBy?`<div class="by">등록: ${esc(i.addedBy)}</div>`:''}
       ${i.memo?`<div class="memo">${esc(i.memo)}</div>`:''}
     </div>
-    <button class="star ${i.frequent?'on':''}" data-action="star" title="자주 사는 물건">${i.frequent?'⭐':'☆'}</button>
+    <button class="star" data-action="star">${i.frequent?'⭐':'☆'}</button>
   </div>`;
 }
 function renderChips(){
-  const cats = ['전체',...state.categories];
-  categoryChips.innerHTML = cats.map(c=>`<button class="chip ${filter===c?'active':''}" data-filter="${esc(c)}">${esc(c)}</button>`).join('');
-  categoryChips.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;render();});
+  const cats=['전체',...state.categories];
+  categoryChips.innerHTML=cats.map(c=>`<button class="chip ${filter===c?'active':''}" data-filter="${esc(c)}">${esc(c)}</button>`).join('');
+  categoryChips.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;render()});
 }
 function bindItemEvents(){
   document.querySelectorAll('.item').forEach(el=>{
@@ -264,166 +271,286 @@ function bindItemEvents(){
     el.querySelector('[data-action=edit]').onclick=()=>openItem(id);
     el.querySelector('[data-action=star]').onclick=()=>toggleStar(id);
   });
-  document.querySelectorAll('[data-quick]').forEach(b=>{
-    b.onclick=()=>{
-      const src=state.items.find(i=>i.id===b.dataset.quick);
-      if(!src) return;
-      state.items.unshift({...src,id:uid(),done:false,createdAt:Date.now()});
-      save();
-    }
-  });
-}
-function toggleDone(id){
-  const i=state.items.find(x=>x.id===id); if(!i)return;
-  i.done=!i.done; i.doneAt=i.done?Date.now():null; save();
-}
-function toggleStar(id){
-  const i=state.items.find(x=>x.id===id); if(!i)return;
-  i.frequent=!i.frequent; save();
+  document.querySelectorAll('[data-quick]').forEach(b=>b.onclick=()=>quickAdd(b.dataset.quick));
 }
 
-const itemDialog=document.querySelector('#itemDialog');
-const form=document.querySelector('#itemForm');
-const itemId=document.querySelector('#itemId');
-const nameEl=document.querySelector('#name');
-const catEl=document.querySelector('#category');
-const qtyEl=document.querySelector('#qty');
-const unitEl=document.querySelector('#unit');
-const memoEl=document.querySelector('#memo');
-const freqEl=document.querySelector('#frequent');
-const deleteItemBtn=document.querySelector('#deleteItemBtn');
+async function commitItem(item){
+  if(cloudMode){
+    await cloud.setDoc(cloud.doc(cloud.db,'families',cloud.uid,'items',item.id),item);
+  }else{
+    const idx=state.items.findIndex(x=>x.id===item.id);
+    if(idx>=0) state.items[idx]=item; else state.items.unshift(item);
+    localSave();render();
+  }
+}
+async function deleteItem(id){
+  if(cloudMode) await cloud.deleteDoc(cloud.doc(cloud.db,'families',cloud.uid,'items',id));
+  else{state.items=state.items.filter(x=>x.id!==id);localSave();render()}
+}
+async function toggleDone(id){
+  const i=state.items.find(x=>x.id===id);if(!i)return;
+  i.done=!i.done;i.doneAt=i.done?Date.now():null;
+  if(cloudMode) await cloud.updateDoc(cloud.doc(cloud.db,'families',cloud.uid,'items',id),{done:i.done,doneAt:i.doneAt});
+  else{localSave();render()}
+}
+async function toggleStar(id){
+  const i=state.items.find(x=>x.id===id);if(!i)return;
+  i.frequent=!i.frequent;
+  if(cloudMode) await cloud.updateDoc(cloud.doc(cloud.db,'families',cloud.uid,'items',id),{frequent:i.frequent});
+  else{localSave();render()}
+}
+async function quickAdd(id){
+  const src=state.items.find(i=>i.id===id);if(!src)return;
+  const item={...src,id:uid(),done:false,doneAt:null,createdAt:Date.now(),addedBy:profile.memberName||'가족'};
+  await commitItem(item);
+}
+
+const itemDialog=q('#itemDialog'),form=q('#itemForm'),itemId=q('#itemId'),
+nameEl=q('#name'),catEl=q('#category'),qtyEl=q('#qty'),unitEl=q('#unit'),
+memoEl=q('#memo'),freqEl=q('#frequent'),deleteItemBtn=q('#deleteItemBtn');
 
 function syncSelects(){
-  catEl.innerHTML = state.categories.map(x=>`<option>${esc(x)}</option>`).join('');
-  unitEl.innerHTML = [''].concat(state.units).map(x=>`<option value="${esc(x)}">${esc(x||'단위 없음')}</option>`).join('');
+  catEl.innerHTML=state.categories.map(x=>`<option>${esc(x)}</option>`).join('');
+  unitEl.innerHTML=[''].concat(state.units).map(x=>`<option value="${esc(x)}">${esc(x||'단위 없음')}</option>`).join('');
 }
 function openItem(id=null){
   syncSelects();
   if(id){
-    const i=state.items.find(x=>x.id===id); if(!i)return;
-    document.querySelector('#dialogTitle').textContent='물건 수정';
-    itemId.value=i.id; nameEl.value=i.name; catEl.value=i.category;
-    qtyEl.value=i.qty||''; unitEl.value=i.unit||''; memoEl.value=i.memo||'';
-    freqEl.checked=!!i.frequent; deleteItemBtn.classList.remove('hidden');
+    const i=state.items.find(x=>x.id===id);if(!i)return;
+    q('#dialogTitle').textContent='물건 수정';itemId.value=i.id;nameEl.value=i.name;
+    catEl.value=i.category;qtyEl.value=i.qty||'';unitEl.value=i.unit||'';memoEl.value=i.memo||'';
+    freqEl.checked=!!i.frequent;deleteItemBtn.classList.remove('hidden');
   }else{
-    document.querySelector('#dialogTitle').textContent='물건 추가';
-    itemId.value=''; form.reset(); syncSelects(); deleteItemBtn.classList.add('hidden');
-    if(filter!=='전체' && state.categories.includes(filter)) catEl.value=filter;
+    q('#dialogTitle').textContent='물건 추가';itemId.value='';form.reset();syncSelects();
+    deleteItemBtn.classList.add('hidden');
+    if(filter!=='전체'&&state.categories.includes(filter))catEl.value=filter;
   }
-  itemDialog.showModal();
-  setTimeout(()=>nameEl.focus(),50);
+  itemDialog.showModal();setTimeout(()=>nameEl.focus(),50);
 }
-form.addEventListener('submit',e=>{
+form.addEventListener('submit',async e=>{
   e.preventDefault();
-  const data={
+  const old=itemId.value?state.items.find(x=>x.id===itemId.value):null;
+  const item={
+    id:itemId.value||uid(),
     name:nameEl.value.trim(),
-    category:catEl.value || state.categories[0],
-    qty:qtyEl.value.trim(),
-    unit:unitEl.value,
-    memo:memoEl.value.trim(),
-    frequent:freqEl.checked
+    category:catEl.value||state.categories[0],
+    qty:qtyEl.value.trim(),unit:unitEl.value,memo:memoEl.value.trim(),
+    frequent:freqEl.checked,
+    done:old?.done||false,doneAt:old?.doneAt||null,
+    createdAt:old?.createdAt||Date.now(),
+    addedBy:old?.addedBy||(profile.memberName||'나')
   };
-  if(!data.name) return;
-  if(itemId.value){
-    Object.assign(state.items.find(x=>x.id===itemId.value),data);
-  }else{
-    state.items.unshift({id:uid(),...data,done:false,createdAt:Date.now()});
-  }
-  itemDialog.close(); save();
+  if(!item.name)return;
+  itemDialog.close();await commitItem(item);
 });
-deleteItemBtn.onclick=()=>{
-  if(!itemId.value) return;
-  if(confirm('이 항목을 삭제할까요?')){
-    state.items=state.items.filter(x=>x.id!==itemId.value);
-    itemDialog.close(); save();
-  }
-};
-document.querySelector('#cancelItemBtn').onclick=()=>itemDialog.close();
-document.querySelector('#addBtn').onclick=()=>openItem();
+deleteItemBtn.onclick=async()=>{if(itemId.value&&confirm('이 항목을 삭제할까요?')){itemDialog.close();await deleteItem(itemId.value)}};
+q('#cancelItemBtn').onclick=()=>itemDialog.close();
+q('#addBtn').onclick=()=>openItem();
 
-document.querySelector('#clearDoneBtn').onclick=()=>{
-  const n=state.items.filter(i=>i.done).length;
-  if(!n) return;
-  if(confirm(`구매완료 ${n}개를 모두 삭제할까요?`)){
-    state.items=state.items.filter(i=>!i.done); save();
+q('#clearDoneBtn').onclick=async()=>{
+  const done=state.items.filter(i=>i.done);if(!done.length)return;
+  if(!confirm(`구매완료 ${done.length}개를 모두 삭제할까요?`))return;
+  if(cloudMode){
+    for(const i of done) await cloud.deleteDoc(cloud.doc(cloud.db,'families',cloud.uid,'items',i.id));
+  }else{
+    state.items=state.items.filter(i=>!i.done);localSave();render();
   }
 };
 
-const settingsDialog=document.querySelector('#settingsDialog');
-document.querySelector('#settingsBtn').onclick=()=>{renderSettings();settingsDialog.showModal();};
-document.querySelector('#closeSettingsBtn').onclick=()=>settingsDialog.close();
+const settingsDialog=q('#settingsDialog');
+q('#settingsBtn').onclick=()=>{renderSettings();settingsDialog.showModal()};
+q('#closeSettingsBtn').onclick=()=>settingsDialog.close();
 
+async function saveSharedSettings(){
+  localSave();
+  if(cloudMode){
+    await cloud.setDoc(
+      cloud.doc(cloud.db,'families',cloud.uid,'meta','settings'),
+      {categories:state.categories,units:state.units},
+      {merge:true}
+    );
+  }
+}
 function renderSettings(){
-  const makeRows=(arr,type)=>arr.map((v,idx)=>`
-    <div class="manage-row">
-      <input value="${esc(v)}" data-${type}-idx="${idx}">
-      <button class="danger" data-${type}-del="${idx}">삭제</button>
-    </div>`).join('');
-  document.querySelector('#categoryManage').innerHTML=makeRows(state.categories,'cat');
-  document.querySelector('#unitManage').innerHTML=makeRows(state.units,'unit');
+  const rows=(arr,type)=>arr.map((v,idx)=>`<div class="manage-row">
+    <input value="${esc(v)}" data-${type}-idx="${idx}">
+    <button class="danger" data-${type}-del="${idx}">삭제</button></div>`).join('');
+  q('#categoryManage').innerHTML=rows(state.categories,'cat');
+  q('#unitManage').innerHTML=rows(state.units,'unit');
+  q('#shareSummary').textContent=cloudMode
+    ?`${profile.memberName||'가족'} 이름으로 가족 목록을 공유 중입니다.`
+    :'현재 개인 저장 모드입니다.';
 
-  document.querySelectorAll('[data-cat-idx]').forEach(inp=>{
-    inp.onchange=()=>{
-      const idx=+inp.dataset.catIdx, old=state.categories[idx], val=inp.value.trim();
-      if(!val){inp.value=old;return;}
-      state.categories[idx]=val;
-      state.items.forEach(i=>{if(i.category===old)i.category=val});
-      if(filter===old) filter=val; save(); renderSettings();
+  document.querySelectorAll('[data-cat-idx]').forEach(inp=>inp.onchange=async()=>{
+    const idx=+inp.dataset.catIdx,old=state.categories[idx],val=inp.value.trim();
+    if(!val){inp.value=old;return}
+    state.categories[idx]=val;state.items.forEach(i=>{if(i.category===old)i.category=val});
+    if(filter===old)filter=val;
+    if(cloudMode){
+      for(const i of state.items.filter(i=>i.category===val)) await commitItem(i);
     }
+    await saveSharedSettings();render();renderSettings();
   });
-  document.querySelectorAll('[data-unit-idx]').forEach(inp=>{
-    inp.onchange=()=>{
-      const idx=+inp.dataset.unitIdx, old=state.units[idx], val=inp.value.trim();
-      if(!val){inp.value=old;return;}
-      state.units[idx]=val;
-      state.items.forEach(i=>{if(i.unit===old)i.unit=val});
-      save(); renderSettings();
-    }
+  document.querySelectorAll('[data-unit-idx]').forEach(inp=>inp.onchange=async()=>{
+    const idx=+inp.dataset.unitIdx,old=state.units[idx],val=inp.value.trim();
+    if(!val){inp.value=old;return}
+    state.units[idx]=val;state.items.forEach(i=>{if(i.unit===old)i.unit=val});
+    if(cloudMode){for(const i of state.items.filter(i=>i.unit===val))await commitItem(i)}
+    await saveSharedSettings();render();renderSettings();
   });
-  document.querySelectorAll('[data-cat-del]').forEach(btn=>{
-    btn.onclick=()=>{
-      if(state.categories.length<=1)return alert('카테고리는 최소 1개가 필요합니다.');
-      const idx=+btn.dataset.catDel, old=state.categories[idx];
-      if(state.items.some(i=>i.category===old)) return alert('사용 중인 카테고리입니다. 항목을 다른 카테고리로 옮긴 뒤 삭제해주세요.');
-      state.categories.splice(idx,1); if(filter===old) filter='전체'; save(); renderSettings();
-    }
+  document.querySelectorAll('[data-cat-del]').forEach(btn=>btn.onclick=async()=>{
+    if(state.categories.length<=1)return alert('카테고리는 최소 1개가 필요합니다.');
+    const idx=+btn.dataset.catDel,old=state.categories[idx];
+    if(state.items.some(i=>i.category===old))return alert('사용 중인 카테고리입니다.');
+    state.categories.splice(idx,1);if(filter===old)filter='전체';await saveSharedSettings();render();renderSettings();
   });
-  document.querySelectorAll('[data-unit-del]').forEach(btn=>{
-    btn.onclick=()=>{
-      const idx=+btn.dataset.unitDel, old=state.units[idx];
-      if(state.items.some(i=>i.unit===old)) return alert('사용 중인 단위입니다. 항목의 단위를 바꾼 뒤 삭제해주세요.');
-      state.units.splice(idx,1); save(); renderSettings();
-    }
+  document.querySelectorAll('[data-unit-del]').forEach(btn=>btn.onclick=async()=>{
+    const idx=+btn.dataset.unitDel,old=state.units[idx];
+    if(state.items.some(i=>i.unit===old))return alert('사용 중인 단위입니다.');
+    state.units.splice(idx,1);await saveSharedSettings();render();renderSettings();
   });
 }
-document.querySelector('#addCategoryBtn').onclick=()=>{
+q('#addCategoryBtn').onclick=async()=>{
   const v=prompt('새 카테고리 이름');
-  if(v&&v.trim()){state.categories.push(v.trim());save();renderSettings();}
+  if(v&&v.trim()&&!state.categories.includes(v.trim())){state.categories.push(v.trim());await saveSharedSettings();render();renderSettings()}
 };
-document.querySelector('#addUnitBtn').onclick=()=>{
+q('#addUnitBtn').onclick=async()=>{
   const v=prompt('새 단위 이름');
-  if(v&&v.trim()){state.units.push(v.trim());save();renderSettings();}
+  if(v&&v.trim()&&!state.units.includes(v.trim())){state.units.push(v.trim());await saveSharedSettings();renderSettings()}
 };
-
-document.querySelector('#exportBtn').onclick=()=>{
+q('#exportBtn').onclick=()=>{
   const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='shopping-backup.json'; a.click(); URL.revokeObjectURL(a.href);
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='shopping-backup.json';a.click();URL.revokeObjectURL(a.href);
 };
-document.querySelector('#importFile').onchange=async e=>{
-  const f=e.target.files[0]; if(!f)return;
+q('#importFile').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
   try{
     const obj=JSON.parse(await f.text());
-    if(!obj.categories||!obj.units||!obj.items) throw new Error();
-    state=obj; save(); renderSettings(); alert('백업을 불러왔습니다.');
-  }catch(err){ alert('올바른 백업 파일이 아닙니다.'); }
+    if(!obj.categories||!obj.units||!obj.items)throw 0;
+    state=obj;await saveSharedSettings();
+    if(cloudMode){for(const i of state.items)await commitItem(i)}
+    render();renderSettings();alert('백업을 불러왔습니다.');
+  }catch(err){alert('올바른 백업 파일이 아닙니다.')}
   e.target.value='';
 };
 
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+const shareDialog=q('#shareDialog');
+q('#openShareBtn').onclick=()=>{
+  q('#memberName').value=profile.memberName||'';
+  q('#familyEmail').value=profile.email||'';
+  q('#familyPassword').value='';
+  q('#shareMessage').textContent='';
+  q('#firebaseMissing').classList.toggle('hidden',firebaseConfigured());
+  q('#logoutBtn').classList.toggle('hidden',!cloudMode);
+  shareDialog.showModal();
+};
+q('#closeShareBtn').onclick=()=>shareDialog.close();
+
+function firebaseConfigured(){
+  const c=window.FIREBASE_CONFIG||{};
+  return !!(c.apiKey&&c.authDomain&&c.projectId&&c.appId);
 }
+async function loadFirebase(){
+  if(!firebaseConfigured())throw new Error('Firebase 설정이 필요합니다.');
+  const appMod=await import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js');
+  const authMod=await import('https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js');
+  const fsMod=await import('https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js');
+  const app=appMod.initializeApp(window.FIREBASE_CONFIG);
+  const auth=authMod.getAuth(app),db=fsMod.getFirestore(app);
+  return {...authMod,...fsMod,auth,db};
+}
+async function connectUser(user){
+  cloud.uid=user.uid;cloudMode=true;
+  if(unsubscribeItems)unsubscribeItems();
+  if(unsubscribeSettings)unsubscribeSettings();
+
+  const itemsCol=cloud.collection(cloud.db,'families',cloud.uid,'items');
+  unsubscribeItems=cloud.onSnapshot(itemsCol,async snap=>{
+    const incoming=snap.docs.map(d=>d.data()).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    if(snap.empty && state.items.length){
+      const localItems=[...state.items];
+      if(confirm('현재 이 휴대폰의 목록을 가족 공유 목록에 올릴까요?')){
+        for(const i of localItems){
+          const item={...i,addedBy:i.addedBy||profile.memberName||'가족'};
+          await cloud.setDoc(cloud.doc(cloud.db,'families',cloud.uid,'items',item.id),item);
+        }
+      }
+    }else{
+      state.items=incoming;localSave();render();
+    }
+  });
+
+  const settingsDoc=cloud.doc(cloud.db,'families',cloud.uid,'meta','settings');
+  unsubscribeSettings=cloud.onSnapshot(settingsDoc,async snap=>{
+    if(snap.exists()){
+      const d=snap.data();
+      if(Array.isArray(d.categories))state.categories=d.categories;
+      if(Array.isArray(d.units))state.units=d.units;
+      localSave();render();
+    }else{
+      await cloud.setDoc(settingsDoc,{categories:state.categories,units:state.units});
+    }
+  });
+  updateSyncUI();
+}
+async function familyAction(mode){
+  const member=q('#memberName').value.trim(),email=q('#familyEmail').value.trim(),password=q('#familyPassword').value;
+  if(!member)return alert('이 휴대폰 사용자 이름을 입력해주세요.');
+  if(!email||password.length<6)return alert('가족용 이메일과 6자 이상 비밀번호를 입력해주세요.');
+  profile={memberName:member,email};saveProfile();
+  q('#shareMessage').textContent='연결 중...';
+  try{
+    if(!cloud)cloud=await loadFirebase();
+    let cred;
+    if(mode==='create')cred=await cloud.createUserWithEmailAndPassword(cloud.auth,email,password);
+    else cred=await cloud.signInWithEmailAndPassword(cloud.auth,email,password);
+    await connectUser(cred.user);
+    q('#shareMessage').textContent='가족 공유가 연결되었습니다.';
+    q('#logoutBtn').classList.remove('hidden');
+    render();renderSettings();
+  }catch(e){
+    q('#shareMessage').textContent='연결 실패: '+friendlyFirebaseError(e);
+  }
+}
+function friendlyFirebaseError(e){
+  const c=e?.code||'';
+  if(c.includes('email-already-in-use'))return '이미 만든 가족 계정입니다. 로그인 버튼을 사용하세요.';
+  if(c.includes('invalid-credential'))return '이메일 또는 비밀번호를 확인해주세요.';
+  if(c.includes('operation-not-allowed'))return 'Firebase에서 Email/Password 로그인을 활성화해주세요.';
+  return e?.message||'설정을 확인해주세요.';
+}
+q('#createFamilyBtn').onclick=()=>familyAction('create');
+q('#loginFamilyBtn').onclick=()=>familyAction('login');
+q('#logoutBtn').onclick=async()=>{
+  if(!cloudMode)return;
+  if(confirm('이 휴대폰에서 가족 공유 연결을 해제할까요?')){
+    if(unsubscribeItems)unsubscribeItems();if(unsubscribeSettings)unsubscribeSettings();
+    await cloud.signOut(cloud.auth);cloudMode=false;cloud.uid=null;render();renderSettings();shareDialog.close();
+  }
+};
+
+function updateSyncUI(){
+  q('#syncDot').classList.toggle('on',cloudMode);
+  q('#syncText').textContent=cloudMode?`가족 공유 중 · ${profile.memberName||'가족'}`:'개인 저장';
+}
+
+async function tryRestoreSession(){
+  if(!firebaseConfigured())return;
+  try{
+    cloud=await loadFirebase();
+    cloud.onAuthStateChanged(cloud.auth,user=>{if(user)connectUser(user);else{cloudMode=false;updateSyncUI()}});
+  }catch(e){}
+}
+
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+window.addEventListener('load',()=>{
+  setTimeout(()=>q('#splash').classList.add('hide'),1300);
+  setTimeout(()=>q('#splash').remove(),2300);
+});
+
 render();
+tryRestoreSession();
 </script>
 </body>
 </html>

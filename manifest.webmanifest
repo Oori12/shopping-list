@@ -1,9 +1,9 @@
 {
-  "name": "살 것 - 장보기 목록",
+  "name": "살 것 - 가족 장보기 목록",
   "short_name": "살 것",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f7f4ee",
+  "background_color": "#ffffff",
   "theme_color": "#f7f4ee",
   "icons": [
     {
